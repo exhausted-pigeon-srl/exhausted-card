@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { ERC721 } from "solmate/tokens/ERC721.sol";
 import { Base64 } from "@openzeppelin/contracts/utils/Base64.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -20,10 +20,8 @@ contract ExhaustedPigeonCard is ERC721 {
     }
 
     function tokenURI(uint256 id) public view override returns (string memory) {
-        address _owner = _ownerOf(id);
-
-        if(_owner == address(0)) return "";
-
+        // Will revert if not minted
+        address _owner = ownerOf(id);
         uint256 _balance = _owner.balance;
 
         // 3 decimals precision, in eth: A.BCD
