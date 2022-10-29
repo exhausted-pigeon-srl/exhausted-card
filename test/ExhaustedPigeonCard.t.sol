@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import "forge-std/Test.sol";
+import "../src/ExhaustedPigeonCard.sol";
+
+contract ExhaustedPigeonCard_Test is Test {
+    ExhaustedPigeonCard _card;
+
+    function setUp() public {
+        _card = new ExhaustedPigeonCard();
+    }
+
+    function test_mint_shouldMintAndIncrementNonce(uint8 _quantity) public {
+        vm.assume(_quantity > 0 && _quantity < 15);
+
+        // Mint _quantity token
+        for(uint256 i; i < _quantity; ++i)
+            _card.mint();
+        
+        // Check: _quantity token have been minted?
+        assertEq(_card.balanceOf(address(this)), _quantity);
+
+        // Check: the next tokenId is the correct one (id's are starting at 1,
+        //        should therefore be _quantity + 1)?
+        _card.mint();
+        assertEq(_card.ownerOf(_quantity + 1), address(this));
+    }
+
+    function test_tokenUri_shouldReturnCorrectTokenUri() public {
+        // Mint one token
+        _card.mint();
+        
+        // Check: is a valid base64 uri returned?
+        assertEq(_card.tokenURI(1), "data:application/json;base64,eyJuYW1lIjoiRXhoYXVzdGVkIFBpZ2VvbiBWaXJ0dWFsIENhcmQiLCAiaW1hZ2UiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIyYVdWM1FtOTRQU0l3SURBZ05EQXdJRFF3TUNJZ2RtVnljMmx2YmowaU1TNHhJaUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lQanhrWldaelBqeHNhVzVsWVhKSGNtRmthV1Z1ZENCcFpEMGlSM0lpUGp4emRHOXdJRzltWm5ObGREMGlNQ1VpSUhOMGIzQXRZMjlzYjNJOUluSmxaQ0lnTHo0OGMzUnZjQ0J2Wm1aelpYUTlJakV3TUNVaUlITjBiM0F0WTI5c2IzSTlJbWR5WldWdUlpQXZQand2YkdsdVpXRnlSM0poWkdsbGJuUStQQzlrWldaelBqeHlaV04wSUhkcFpIUm9QU0kwTURBaUlHaGxhV2RvZEQwaU5EQXdJaUJtYVd4c1BTSWpNelF6TnpNMUlpOCtQSEJoZEdnZ2MzUjViR1U5SW1acGJHdzZJMlUyWlRabE5pSWdaRDBpVFNBek16WXVORFEzTnpnc05DNDVORGsxTlNCRElETXlPQzR5TURNME55dzBMamt3TXpFMUlETXhPQzR4T1RJMU15dzJMamt5TmpFMklETXdOUzQ1TXprM09Td3hNUzQxTnpRMk15QXpNamt1TmpjMk1URXNOVGN1TmpneE5qRWdNekV5TGpNMU1qRTVMRGd6TGpnM01qY3pNaUF5T0RVdU1UVXdNVFVzTVRBMUxqSTNNVFlnTXpBNUxqQXdOelF5TERFd05pNDFORFF3T1NBek1qY3VPRGswTXpjc09UY3VOek0wTXpJMElETXpOeTQyTnpBNU5DdzNNQzQwTkRNeU5DQXpOVGN1TXpRM05Ua3NOamN1TnpRd05TQXpOakl1TlRFNE1UUXNOakV1TVRZM09UWWdNelk0TGpJeU1qSXhMRFUwTGpjek9Ea3hJRXdnTXprMExqZzFPREU1TERVeUxqUXlOak16SURNM05TNDNNamd5Tnl3ME5pNHlOalV6TkNCRElETTNNQzR3TURneE5Dd3lNeTQ0TlRjMk5TQXpOakV1TVRnd056UXNOUzR3T0RnMk5pQXpNell1TkRRM056Z3NOQzQ1TkRrMU5TQmFJRTBnTXpJMExqRTVOall4TERJMExqWTNOVE16SURNek9TNDVPRE0xTERNMExqTXlNamtnTXpVMExqSTVOVFlzTWpRdU9EY3hPVGdnTXpRd0xqSTBOVEExTERNNExqWTFPRGs1SUZvZ1RTQTJMakV4TlRJeExERXdOaTR3T0RZME15QXlPVEF1Tnpnd01UWXNNVFl1TXpRME5UTWdReUF6TWprdU1EQTVPQ3cxT1M0ME1UQTNOQ0F5TnpndU9UUTNPREVzTVRBMExqTTBPRGs1SURJMU5pNHlORFUwTERFd05TNDROVEl3TWlCTUlERTVNQzQyTkRNME55d3hNRGN1TWpBMk16WWdNalF5TGpZek9EUTBMRFV6TGpnNE9UWTVJREl6Tnk0ek1EWXpNU3cwT0M0ME5qazROU0F4T0RFdU1qazRNelVzTVRBMkxqRTVPRGc1SUZvaUx6NDhkR1Y0ZENCemRIbHNaVDBpWm05dWRDMXphWHBsT2pReUxqWTJOamR3ZUR0bWIyNTBMV1poYldsc2VUcHpZVzV6TFhObGNtbG1PMlpwYkd3NkkyVTJaVFpsTmlJZ2VEMGlPQ0lnZVQwaU1UUTJJajVGZUdoaGRYTjBaV1FnVUdsblpXOXVQQzkwWlhoMFBqeDBaWGgwSUhOMGVXeGxQU0ptYjI1MExYTjBlV3hsT21sMFlXeHBZenRtYjI1MExYTnBlbVU2TWpZdU5qWTJOM0I0TzJadmJuUXRabUZ0YVd4NU9uTmhibk10YzJWeWFXWTdabWxzYkRvalpUWmxObVUySWlCNFBTSTBNaUlnZVQwaU1UZ3dJajVDYkc5amEyTm9ZV2x1SUVWdVoybHVaV1Z5YVc1blBDOTBaWGgwUGp4MFpYaDBJSE4wZVd4bFBTSm1iMjUwTFhOcGVtVTZNVFp3ZUR0bWIyNTBMV1poYldsc2VUcHpZVzV6TFhObGNtbG1PMlpwYkd3NkkyVTJaVFpsTmlJZ2VEMGlNVGdpSUhrOUlqSTFOU0krVkdocGN5Qk9SbFFnWW5WemFXNWxjM01nWTJGeVpDQnBjeUJqZFhKeVpXNTBiSGtnYjNkdVpXUWdZbms4TDNSbGVIUStQSFJsZUhRZ2MzUjViR1U5SW1admJuUXRjMmw2WlRveE5IQjRPMlp2Ym5RdFptRnRhV3g1T25OaGJuTXRjMlZ5YVdZN1ptbHNiRG9qWlRabE5tVTJJaUI0UFNJeE5DSWdlVDBpTWpjMUlqNHdlR0kwWXpjNVpHRmlPR1l5TlRsak4yRmxaVFpsTldJeVlXRTNNams0TWpFNE5qUXlNamRsT0RROEwzUmxlSFErUEhSbGVIUWdjM1I1YkdVOUltWnZiblF0YzJsNlpUb3hOSEI0TzJadmJuUXRabUZ0YVd4NU9uTmhibk10YzJWeWFXWTdabWxzYkRvalpUWmxObVUySWlCNFBTSXhOQ0lnZVQwaU1qa3dJajRvTnpreU1qZ3hOakkxTVRRdU1qWTBSVlJJS1R3dmRHVjRkRDQ4Y21WamRDQnpkSGxzWlQwaVptbHNiRHAxY213b0kwZHlLU0lnZDJsa2RHZzlJak00TUNJZ2FHVnBaMmgwUFNJek1TSWdlRDBpTVRBaUlIazlJak13TUNJdlBqeDBaWGgwSUhOMGVXeGxQU0ptYjI1MExYTnBlbVU2TVRad2VEdG1iMjUwTFdaaGJXbHNlVHB6WVc1ekxYTmxjbWxtTzJacGJHdzZJekF3TURBd01DSWdlRDBpTXpnMUlpQjVQU0l6TWpBaVBsZzhMM1JsZUhRK1BIUmxlSFFnYzNSNWJHVTlJbVp2Ym5RdGMybDZaVG94TUhCNE8yWnZiblF0Wm1GdGFXeDVPbk5oYm5NdGMyVnlhV1k3Wm1sc2JEb2paVFpsTm1VMklpQjRQU0l4TUNJZ2VUMGlNelV3SWo1d2IyOXlJR0ZtUEM5MFpYaDBQangwWlhoMElITjBlV3hsUFNKbWIyNTBMWE5wZW1VNk1UQndlRHRtYjI1MExXWmhiV2xzZVRwellXNXpMWE5sY21sbU8yWnBiR3c2STJVMlpUWmxOaUlnZUQwaU16WXdJaUI1UFNJek5UQWlQbmRvWVd4bFBDOTBaWGgwUGp4MFpYaDBJSE4wZVd4bFBTSm1iMjUwTFhOcGVtVTZNamh3ZUR0bWIyNTBMV1poYldsc2VUcHpZVzV6TFhObGNtbG1PeUJtYVd4c09pQWpabVptWm1abU95SWdlRDBpT0NJZ2VUMGlNemd3SWlBK2QzZDNMbVY0YUdGMWMzUmxaQzF3YVdkbGIyNHVlSGw2UEM5MFpYaDBQand2YzNablBnPT0iLCAiZGVzY3JpcHRpb24iOiAid3d3LmV4aGF1c3RlZC1waWdlb24ueHl6In0=");
+    }
+
+    function test_tokenUri_shouldReturnEmptyTokenUriIfNotMinted(uint256 _tokenId) public {
+        assertEq(_card.tokenURI(_tokenId), "");
+    }
+}
