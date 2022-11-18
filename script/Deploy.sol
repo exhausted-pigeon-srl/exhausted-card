@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import "forge-std/Script.sol";
 import '../src/ExhaustedPigeonCard.sol';
 
-contract DeployGoerli is Script {
+contract Deploy is Script {
     function setUp() public {}
 
     function run() public {
